@@ -8,6 +8,10 @@
 </head>
 
 <body>
+    <form action="/todos/create" method="POST">
+        <input type="text" name="todo_item">
+        <input type="submit" value="Create">
+    </form>
     <ul>
         {% for d in data %}
         <li>{{d.todo_item}}</li>
