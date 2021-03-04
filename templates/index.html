@@ -5,19 +5,50 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flast server</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <form action="/todos/create" method="POST">
-        <input type="text" name="todo_item">
+    <div id="error" class="hidden">error something went wrong</div>
+    <form id='form'>
+        <input type="text" id='todo_item' name="todo_item">
         <input type="submit" value="Create">
     </form>
-    <ul>
+    <ul id='todo_list'>
         {% for d in data %}
         <li>{{d.todo_item}}</li>
         {% endfor %}
     </ul>
 
+    <script>
+        document.getElementById('form').onsubmit = function (e) {
+            e.preventDefault();
+            fetch('/todos/create', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'todo_item': document.getElementById('todo_item').value
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function (response) {
+                return response.json();
+            }).then(function (jsonResponse) {
+                console.log(jsonResponse);
+                const item = document.createElement('LI');
+                item.innerHTML = jsonResponse['todo_item'];
+                document.getElementById('todo_list').appendChild(item);
+                document.getElementById('error').className = 'hidden'
+            }).catch(function () {
+                getElementById('error').className = '';
+            });
+
+        }
+    </script>
 
 </body>
 

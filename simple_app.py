@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, jsonify, request
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -25,11 +25,13 @@ db.create_all()
 
 @app.route('/todos/create', methods=['POST', ])
 def create():
-    todo_item = request.form.get('todo_item')
+    todo_item = request.get_json()['todo_item']
     todo = Todo(todo_item=todo_item)
     db.session.add(todo)
     db.session.commit()
-    return redirect(url_for('index'))
+    return jsonify({
+        'todo_item': todo.todo_item
+    })
 
 
 @app.route('/')
