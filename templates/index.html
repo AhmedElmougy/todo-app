@@ -13,6 +13,7 @@
 </head>
 
 <body>
+    <h2>Todo List</h2>
     <div id="error" class="hidden">error something went wrong</div>
     <form id='form'>
         <input type="text" id='todo_item' name="todo_item">
@@ -20,7 +21,10 @@
     </form>
     <ul id='todo_list'>
         {% for d in data %}
-        <li>{{d.todo_item}}</li>
+        <li>
+            <input type="checkbox" data-id='{{d.id}}' class="checked" {% if d.checked %}checked{%
+                endif%}>{{d.todo_item}}
+        </li>
         {% endfor %}
     </ul>
 
@@ -40,15 +44,50 @@
             }).then(function (jsonResponse) {
                 console.log(jsonResponse);
                 const item = document.createElement('LI');
-                item.innerHTML = jsonResponse['todo_item'];
+                item.innerHTML = "<li class='todo-item'> <input type='checkbox' class='checked' data-id="
+                    + jsonResponse['id'] + ">" + jsonResponse['todo_item'] + "</li>";
                 const list = document.getElementById('todo_list');
                 list.insertBefore(item, list.firstChild);
                 document.getElementById('error').className = 'hidden'
+                listenCheckbox();
             }).catch(function () {
-                getElementById('error').className = '';
+                document.getElementById('error').className = '';
             });
 
         }
+
+        listenCheckbox();
+
+        function listenCheckbox() {
+            const checkboxes = document.querySelectorAll('.checked');
+            for (let i = 0; i < checkboxes.length; i++) {
+                const checkbox = checkboxes[i];
+                checkbox.onchange = function (e) {
+                    console.log('event', e);
+                    const checkboxstate = e.target.checked;
+                    const todoid = e.target.dataset['id']
+                    fetch('/todos/' + todoid + '/edit', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'checked': checkboxstate
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (jsonResponse) {
+                        console.log(jsonResponse);
+
+                        document.getElementById('error').className = 'hidden'
+                    }).catch(function () {
+                        document.getElementById('error').className = '';
+                    });
+                }
+            }
+        }
+
+
     </script>
 
 </body>

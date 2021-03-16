@@ -27,6 +27,31 @@ class Todo(db.Model):
         return f'<Todo {self.id} {self.todo_item}>'
 
 
+@app.route('/todos/<todo_id>/edit', methods=['POST'])
+def update_todo_item_state(todo_id):
+    error = False
+    body = {}
+
+    try:
+        checked = request.get_json()['checked']
+        todo = Todo.query.get(todo_id)
+        todo.checked = checked
+        db.session.commit()
+        body['id'] = todo.id
+        body['checked'] = todo.checked
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
+    if error:
+        abort(404)
+    else:
+        return jsonify(body)
+
+
 @app.route('/todos/create', methods=['POST', ])
 def create():
     error = False
@@ -37,6 +62,7 @@ def create():
         todo = Todo(todo_item=todo_item)
         db.session.add(todo)
         db.session.commit()
+        body['id'] = todo.id
         body['todo_item'] = todo.todo_item
     except:
         db.session.rollback()
