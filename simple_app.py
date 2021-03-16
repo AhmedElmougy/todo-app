@@ -4,6 +4,8 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, a
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+from sqlalchemy import desc
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://user@localhost:5432/todoapp'
@@ -51,4 +53,4 @@ def create():
 
 @app.route('/')
 def index():
-    return render_template('index.html', data=Todo.query.all())
+    return render_template('index.html', data=Todo.query.order_by(desc('id')).all())
