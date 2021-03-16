@@ -41,7 +41,8 @@
                 console.log(jsonResponse);
                 const item = document.createElement('LI');
                 item.innerHTML = jsonResponse['todo_item'];
-                document.getElementById('todo_list').appendChild(item);
+                const list = document.getElementById('todo_list');
+                list.insertBefore(item, list.firstChild);
                 document.getElementById('error').className = 'hidden'
             }).catch(function () {
                 getElementById('error').className = '';
